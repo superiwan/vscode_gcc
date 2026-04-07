@@ -31,9 +31,7 @@
         "-IocPath",
         "${config:stm32.iocFile}",
         "-ProjectName",
-        "${config:stm32.projectName}",
-        "-CubeMxPath",
-        "${config:stm32.cubeMxPath}"
+        "${config:stm32.projectName}"
       ],
       "problemMatcher": []
     },
@@ -47,11 +45,7 @@
         "-File",
         "${workspaceFolder}\\tools\\Invoke-StlinkGdbServer.ps1",
         "-Action",
-        "Start",
-        "-GdbServerPath",
-        "${config:stm32.stlinkGdbServerPath}",
-        "-ProgrammerPath",
-        "C:\\Users\\prohibit\\AppData\\Local\\stm32cube\\bundles\\programmer\\2.22.0+st.1\\bin"
+        "Start"
       ],
       "problemMatcher": []
     },
@@ -167,8 +161,6 @@
         "${workspaceFolder}",
         "-BuildDir",
         "${workspaceFolder}\\build\\Debug",
-        "-ProgrammerPath",
-        "${config:stm32.cubeProgrammerPath}",
         "-FlashAddress",
         "${config:stm32.flashAddress}"
       ],
@@ -185,8 +177,6 @@
         "${workspaceFolder}\\tools\\Invoke-Stm32Flash.ps1",
         "-WorkspaceRoot",
         "${workspaceFolder}",
-        "-ProgrammerPath",
-        "${config:stm32.cubeProgrammerPath}",
         "-EraseOnly"
       ],
       "problemMatcher": []

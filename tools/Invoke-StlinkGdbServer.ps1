@@ -2,13 +2,15 @@
 param(
     [ValidateSet("Start", "Stop")]
     [string]$Action = "Start",
-    [string]$GdbServerPath = "C:\Users\prohibit\AppData\Local\stm32cube\bundles\stlink-gdbserver\7.13.0+st.3\bin\ST-LINK_gdbserver.exe",
-    [string]$ProgrammerPath = "C:\Users\prohibit\AppData\Local\stm32cube\bundles\programmer\2.22.0+st.1\bin",
+    [string]$GdbServerPath,
+    [string]$ProgrammerPath,
     [int]$Port = 61234
 )
 
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = "Stop"
+
+. "$PSScriptRoot\STM32.Common.ps1"
 
 function Stop-StlinkProcesses {
     $names = @("ST-LINK_gdbserver", "stlinkserver")
@@ -25,12 +27,24 @@ if ($Action -eq "Stop") {
     exit 0
 }
 
-if (-not (Test-Path -LiteralPath $GdbServerPath)) {
-    throw "找不到 ST-LINK_gdbserver：$GdbServerPath"
+if (Test-Path -LiteralPath $ProgrammerPath -PathType Leaf) {
+    $ProgrammerPath = Split-Path -Parent (Resolve-Path -LiteralPath $ProgrammerPath).Path
 }
 
-if (-not (Test-Path -LiteralPath $ProgrammerPath)) {
-    throw "找不到 STM32CubeProgrammer bin 目录：$ProgrammerPath"
+$tools = Get-Stm32ToolPaths -ProgrammerPath $ProgrammerPath -StlinkGdbServerPath $GdbServerPath
+
+if (-not $tools.StlinkGdbServer) {
+    throw "找不到 ST-LINK_gdbserver。请先安装 ST-LINK_gdbserver，或在本地 .vscode/settings.json 里设置 stm32.stlinkGdbServerPath。"
+}
+
+if (-not $tools.CubeProgrammer) {
+    throw "找不到 STM32CubeProgrammer。请先安装 STM32CubeProgrammer，或在本地 .vscode/settings.json 里设置 stm32.cubeProgrammerPath。"
+}
+
+$programmerBin = Split-Path -Parent $tools.CubeProgrammer
+
+if (-not (Test-Path -LiteralPath $programmerBin)) {
+    throw "找不到 STM32CubeProgrammer bin 目录：$programmerBin"
 }
 
 Stop-StlinkProcesses
@@ -39,10 +53,10 @@ $arguments = @(
     "-p", $Port,
     "-d",
     "-v",
-    "-cp", $ProgrammerPath
+    "-cp", $programmerBin
 )
 
-Start-Process -FilePath $GdbServerPath -ArgumentList $arguments -WindowStyle Hidden
+Start-Process -FilePath $tools.StlinkGdbServer -ArgumentList $arguments -WindowStyle Hidden
 Start-Sleep -Seconds 2
 
 $listener = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -eq $Port }

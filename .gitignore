@@ -2,6 +2,8 @@
 build/
 .cache/
 .cmake/
+.stm32-init-backup/
+.vscode/settings.json
 .vscode/*.code-snippets
 .vscode/ipch/
 *.log

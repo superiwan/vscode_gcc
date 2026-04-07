@@ -1,0 +1,21 @@
+{
+  "cmake.configureOnOpen": false,
+  "cmake.generator": "Ninja",
+  "cmake.sourceDirectory": "${workspaceFolder}",
+  "cmake.buildDirectory": "${workspaceFolder}/build/Debug",
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "files.associations": {
+    "*.ioc": "ini"
+  },
+  "stm32.projectRoot": "${workspaceFolder}",
+  "stm32.iocFile": "",
+  "stm32.projectName": "",
+  "stm32.device": "",
+  "stm32.interface": "swd",
+  "stm32.runToEntryPoint": "main",
+  "stm32.flashAddress": "0x08000000",
+  "stm32.cubeMxPath": "",
+  "stm32.cubeProgrammerPath": "",
+  "stm32.toolchainGdbPath": "",
+  "stm32.stlinkGdbServerPath": ""
+}

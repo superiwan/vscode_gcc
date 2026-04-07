@@ -164,7 +164,7 @@ function Get-SingleIocFile {
     }
 
     if ($iocFiles.Count -gt 1) {
-        throw "检测到多个 .ioc 文件，请在 .vscode/settings.json 里设置 stm32.iocFile。"
+        throw "检测到多个 .ioc 文件。请先运行 Initialize-Stm32Workspace.ps1，或在本地 .vscode/settings.json 里设置 stm32.iocFile。"
     }
 
     throw "工作区里没有找到 .ioc 文件。"

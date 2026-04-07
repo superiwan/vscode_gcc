@@ -1,3 +1,4 @@
+.omx/
 build/
 .cache/
 .cmake/

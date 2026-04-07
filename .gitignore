@@ -1,0 +1,7 @@
+build/
+.cache/
+.cmake/
+.vscode/*.code-snippets
+.vscode/ipch/
+*.log
+*.tmp

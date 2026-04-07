@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "STM32: Debug active CMake target",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "servertype": "stlink",
+      "device": "${config:stm32.device}",
+      "interface": "${config:stm32.interface}",
+      "gdbPath": "${config:stm32.toolchainGdbPath}",
+      "stlinkPath": "${config:stm32.stlinkGdbServerPath}",
+      "stm32cubeprogrammer": "${config:stm32.cubeProgrammerPath}",
+      "runToEntryPoint": "${config:stm32.runToEntryPoint}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "preLaunchTask": "STM32: Build"
+    },
+    {
+      "name": "STM32: Attach active CMake target",
+      "type": "cortex-debug",
+      "request": "attach",
+      "cwd": "${workspaceFolder}",
+      "servertype": "stlink",
+      "device": "${config:stm32.device}",
+      "interface": "${config:stm32.interface}",
+      "gdbPath": "${config:stm32.toolchainGdbPath}",
+      "stlinkPath": "${config:stm32.stlinkGdbServerPath}",
+      "stm32cubeprogrammer": "${config:stm32.cubeProgrammerPath}",
+      "executable": "${command:cmake.launchTargetPath}"
+    }
+  ]
+}

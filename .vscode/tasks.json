@@ -1,0 +1,165 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "STM32: Check Environment",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32Doctor.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Generate From CubeMX",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32CubeMXGenerate.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-ProjectRoot",
+        "${config:stm32.projectRoot}",
+        "-IocPath",
+        "${config:stm32.iocFile}",
+        "-ProjectName",
+        "${config:stm32.projectName}",
+        "-CubeMxPath",
+        "${config:stm32.cubeMxPath}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Configure",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32Build.ps1",
+        "-Action",
+        "Configure",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-SourceDir",
+        "${config:stm32.projectRoot}",
+        "-BuildDir",
+        "${workspaceFolder}\\build\\Debug",
+        "-BuildType",
+        "Debug"
+      ],
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "STM32: Build",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32Build.ps1",
+        "-Action",
+        "Build",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-SourceDir",
+        "${config:stm32.projectRoot}",
+        "-BuildDir",
+        "${workspaceFolder}\\build\\Debug",
+        "-BuildType",
+        "Debug"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "STM32: Clean Build Dir",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32Build.ps1",
+        "-Action",
+        "Clean",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-BuildDir",
+        "${workspaceFolder}\\build\\Debug"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Flash",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32Flash.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-BuildDir",
+        "${workspaceFolder}\\build\\Debug",
+        "-ProgrammerPath",
+        "${config:stm32.cubeProgrammerPath}",
+        "-FlashAddress",
+        "${config:stm32.flashAddress}"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Erase Chip",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32Flash.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-ProgrammerPath",
+        "${config:stm32.cubeProgrammerPath}",
+        "-EraseOnly"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Open CubeMX",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-Stm32CubeMXGenerate.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}",
+        "-ProjectRoot",
+        "${config:stm32.projectRoot}",
+        "-IocPath",
+        "${config:stm32.iocFile}",
+        "-CubeMxPath",
+        "${config:stm32.cubeMxPath}",
+        "-OpenGuiOnly"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

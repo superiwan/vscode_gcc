@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-vscode.cpptools",
+    "ms-vscode.cmake-tools",
+    "marus25.cortex-debug",
+    "mcu-debug.memory-view",
+    "mcu-debug.peripheral-viewer",
+    "mcu-debug.rtos-views"
+  ]
+}

@@ -303,20 +303,47 @@ function Backup-File {
     Copy-Item -LiteralPath $FilePath -Destination (Join-Path $filesRoot (Split-Path -Leaf $FilePath)) -Force
 }
 
-function Write-ProjectGitIgnore {
+function Write-ProjectIgnoreFile {
     param(
-        [string]$ProjectPath
+        [string]$ProjectPath,
+        [string]$FileName
     )
 
-    $gitIgnorePath = Join-Path $ProjectPath ".gitignore"
+    $ignorePath = Join-Path $ProjectPath $FileName
     $requiredEntries = @(
+        "build/",
+        ".cache/",
+        ".cmake/",
+        ".omx/",
+        ".stm32-init-backup/",
+        "CMakeCache.txt",
+        "CMakeFiles/",
+        "CMakeScripts/",
+        "cmake_install.cmake",
+        "compile_commands.json",
+        "CTestTestfile.cmake",
+        "Testing/",
+        "Makefile",
+        "install_manifest.txt",
+        "CMakeUserPresets.json",
+        "_deps/",
+        "*.elf",
+        "*.map",
+        "*.bin",
+        "*.hex",
+        "*.obj",
+        "*.o",
+        "*.d",
+        "*.log",
+        "*.tmp",
         ".vscode/settings.json",
-        ".stm32-init-backup/"
+        ".vscode/*.code-snippets",
+        ".vscode/ipch/"
     )
 
     $currentLines = @()
-    if (Test-Path -LiteralPath $gitIgnorePath) {
-        $currentLines = @(Get-Content -LiteralPath $gitIgnorePath)
+    if (Test-Path -LiteralPath $ignorePath) {
+        $currentLines = @(Get-Content -LiteralPath $ignorePath)
     }
 
     $updated = [System.Collections.Generic.List[string]]::new()
@@ -330,7 +357,11 @@ function Write-ProjectGitIgnore {
         }
     }
 
-    Set-Content -LiteralPath $gitIgnorePath -Value $updated -Encoding utf8
+    if (-not (Test-Path -LiteralPath $ignorePath)) {
+        New-Item -ItemType File -Path $ignorePath -Force | Out-Null
+    }
+
+    [System.IO.File]::WriteAllLines($ignorePath, [string[]]$updated)
 }
 
 function Copy-TemplateDirectory {
@@ -473,6 +504,7 @@ New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
 Backup-Path -SourcePath (Join-Path $resolvedProjectRoot ".vscode") -BackupRoot $backupRoot
 Backup-Path -SourcePath (Join-Path $resolvedProjectRoot "tools") -BackupRoot $backupRoot
 Backup-File -FilePath (Join-Path $resolvedProjectRoot ".gitignore") -BackupRoot $backupRoot
+Backup-File -FilePath (Join-Path $resolvedProjectRoot ".ignore") -BackupRoot $backupRoot
 if ($iocPath) {
     Backup-File -FilePath $iocPath -BackupRoot $backupRoot
 }
@@ -535,8 +567,9 @@ $settingsJson = $settings | ConvertTo-Json -Depth 6
 Set-Content -LiteralPath $settingsPath -Value $settingsJson -Encoding utf8
 Add-UniqueItem -List $done -Value "已生成本地 .vscode/settings.json。"
 
-Write-ProjectGitIgnore -ProjectPath $resolvedProjectRoot
-Add-UniqueItem -List $done -Value "已更新 .gitignore 忽略本地 settings 和备份目录。"
+Write-ProjectIgnoreFile -ProjectPath $resolvedProjectRoot -FileName ".gitignore"
+Write-ProjectIgnoreFile -ProjectPath $resolvedProjectRoot -FileName ".ignore"
+Add-UniqueItem -List $done -Value "已更新 .gitignore 和 .ignore。"
 
 & (Join-Path $resolvedProjectRoot "tools\Invoke-Stm32Doctor.ps1") -WorkspaceRoot $resolvedProjectRoot
 Add-UniqueItem -List $done -Value "环境检查通过。"

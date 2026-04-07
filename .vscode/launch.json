@@ -17,6 +17,31 @@
       "preLaunchTask": "STM32: Build"
     },
     {
+      "name": "STM32: Debug via external GDB Server",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "servertype": "external",
+      "gdbTarget": "localhost:61234",
+      "device": "${config:stm32.device}",
+      "interface": "${config:stm32.interface}",
+      "gdbPath": "${config:stm32.toolchainGdbPath}",
+      "runToEntryPoint": "${config:stm32.runToEntryPoint}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "overrideLaunchCommands": [
+        "monitor halt",
+        "load",
+        "monitor reset",
+        "monitor halt"
+      ],
+      "overrideResetCommands": [
+        "monitor reset",
+        "monitor halt"
+      ],
+      "preLaunchTask": "STM32: Start GDB Server",
+      "postDebugTask": "STM32: Stop GDB Server"
+    },
+    {
       "name": "STM32: Attach active CMake target",
       "type": "cortex-debug",
       "request": "attach",

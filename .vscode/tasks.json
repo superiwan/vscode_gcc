@@ -38,6 +38,38 @@
       "problemMatcher": []
     },
     {
+      "label": "STM32: Start GDB Server",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-StlinkGdbServer.ps1",
+        "-Action",
+        "Start",
+        "-GdbServerPath",
+        "${config:stm32.stlinkGdbServerPath}",
+        "-ProgrammerPath",
+        "C:\\Users\\prohibit\\AppData\\Local\\stm32cube\\bundles\\programmer\\2.22.0+st.1\\bin"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Stop GDB Server",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\tools\\Invoke-StlinkGdbServer.ps1",
+        "-Action",
+        "Stop"
+      ],
+      "problemMatcher": []
+    },
+    {
       "label": "STM32: Configure",
       "type": "shell",
       "command": "powershell",
@@ -84,6 +116,25 @@
         "isDefault": true
       },
       "problemMatcher": "$gcc"
+    },
+    {
+      "label": "STM32: Build and Flash",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "STM32: Build",
+        "STM32: Flash"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Rebuild and Flash",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "STM32: Clean Build Dir",
+        "STM32: Build",
+        "STM32: Flash"
+      ],
+      "problemMatcher": []
     },
     {
       "label": "STM32: Clean Build Dir",
@@ -158,6 +209,15 @@
         "-CubeMxPath",
         "${config:stm32.cubeMxPath}",
         "-OpenGuiOnly"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "STM32: Quick Start",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "STM32: Check Environment",
+        "STM32: Build and Flash"
       ],
       "problemMatcher": []
     }

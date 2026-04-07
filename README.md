@@ -26,6 +26,8 @@
   负责烧录和整片擦除。
 - [`tools/Invoke-Stm32CubeMXGenerate.ps1`](/D:/vscode_gcc/tools/Invoke-Stm32CubeMXGenerate.ps1)
   负责打开 CubeMX 或用命令行重新生成工程。
+- [`tools/Invoke-StlinkGdbServer.ps1`](/D:/vscode_gcc/tools/Invoke-StlinkGdbServer.ps1)
+  负责启动和停止外部 `ST-LINK gdbserver`。
 
 ## 安装要求
 
@@ -75,6 +77,10 @@ VSCode 扩展建议安装：
   先清理，再重新编译和烧录。
 - `STM32: Quick Start`
   先检查环境，再编译和烧录。
+- `STM32: Start GDB Server`
+  手动启动外部 `ST-LINK gdbserver`。
+- `STM32: Stop GDB Server`
+  手动停止外部 `ST-LINK gdbserver`。
 - `STM32: Flash`
   直接烧录现有产物。
 - `STM32: Erase Chip`
@@ -89,7 +95,12 @@ VSCode 扩展建议安装：
 常用配置：
 
 - `STM32: Debug active CMake target`
+- `STM32: Debug via external GDB Server`
 - `STM32: Attach active CMake target`
+
+如果某些 `ST-LINK/V2` 在官方调试链里不稳定，优先使用：
+
+- `STM32: Debug via external GDB Server`
 
 ## 忽略规则
 

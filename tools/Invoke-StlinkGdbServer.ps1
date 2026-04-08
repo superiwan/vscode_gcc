@@ -27,7 +27,7 @@ if ($Action -eq "Stop") {
     exit 0
 }
 
-if (Test-Path -LiteralPath $ProgrammerPath -PathType Leaf) {
+if (-not [string]::IsNullOrWhiteSpace($ProgrammerPath) -and (Test-Path -LiteralPath $ProgrammerPath -PathType Leaf)) {
     $ProgrammerPath = Split-Path -Parent (Resolve-Path -LiteralPath $ProgrammerPath).Path
 }
 

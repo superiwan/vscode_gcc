@@ -505,6 +505,7 @@ Backup-Path -SourcePath (Join-Path $resolvedProjectRoot ".vscode") -BackupRoot $
 Backup-Path -SourcePath (Join-Path $resolvedProjectRoot "tools") -BackupRoot $backupRoot
 Backup-File -FilePath (Join-Path $resolvedProjectRoot ".gitignore") -BackupRoot $backupRoot
 Backup-File -FilePath (Join-Path $resolvedProjectRoot ".ignore") -BackupRoot $backupRoot
+Backup-File -FilePath (Join-Path $resolvedProjectRoot ".clangd") -BackupRoot $backupRoot
 if ($iocPath) {
     Backup-File -FilePath $iocPath -BackupRoot $backupRoot
 }
@@ -515,7 +516,8 @@ Add-UniqueItem -List $done -Value ("已创建备份目录：{0}" -f $backupRoot)
 
 Copy-TemplateDirectory -DirectoryName ".vscode" -ProjectPath $resolvedProjectRoot
 Copy-TemplateDirectory -DirectoryName "tools" -ProjectPath $resolvedProjectRoot
-Add-UniqueItem -List $done -Value "已写入模板 .vscode 和 tools。"
+Copy-Item -LiteralPath (Join-Path $TemplateRoot ".clangd") -Destination (Join-Path $resolvedProjectRoot ".clangd") -Force
+Add-UniqueItem -List $done -Value "已写入模板 .vscode、tools 和 .clangd。"
 
 if ($iocPath) {
     $newIocFileName = "{0}.ioc" -f $safeProjectName

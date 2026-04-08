@@ -18,7 +18,7 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
 
 - 识别 `.ioc`、`CMakeLists.txt`、`startup_*.s`、`*.ld`
 - 备份目标项目原有的 `.vscode` 和 `tools`
-- 写入模板版 `.vscode` 和 `tools`
+- 写入模板版 `.vscode`、`tools` 和 `.clangd`
 - 生成本地 [`.vscode/settings.json`](/D:/vscode_gcc/.vscode/settings.template.json) 对应的项目配置
 - 自动修正明显不稳的项目名和 `.ioc` 文件名
 - 检查环境
@@ -28,6 +28,8 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
 
 - [`.vscode/settings.template.json`](/D:/vscode_gcc/.vscode/settings.template.json)
   本地 `settings.json` 的模板。
+- [`.clangd`](/D:/vscode_gcc/.clangd)
+  给 `clangd` 使用的编译数据库位置配置。
 - [`.vscode/tasks.json`](/D:/vscode_gcc/.vscode/tasks.json)
   常用任务。
 - [`.vscode/launch.json`](/D:/vscode_gcc/.vscode/launch.json)
@@ -64,9 +66,15 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
 
 VSCode 扩展建议安装：
 
+- `llvm-vs-code-extensions.vscode-clangd`
 - `ms-vscode.cmake-tools`
 - `ms-vscode.cpptools`
 - `marus25.cortex-debug`
+
+建议的分工：
+
+- `clangd` 负责代码分析、补全和红线
+- `cpptools` 保留给调试
 
 ## 识别规则
 
@@ -87,6 +95,7 @@ VSCode 扩展建议安装：
 
 - `.vscode/`
 - `tools/`
+- `.clangd`
 - 本地 `.vscode/settings.json`
 - `.stm32-init-backup/<时间戳>/`
 

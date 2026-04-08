@@ -4,9 +4,16 @@
   "cmake.sourceDirectory": "${workspaceFolder}",
   "cmake.buildDirectory": "${workspaceFolder}/build/Debug",
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "C_Cpp.intelliSenseEngine": "Disabled",
+  "C_Cpp.errorSquiggles": "Disabled",
   "files.associations": {
     "*.ioc": "ini"
   },
+  "clangd.arguments": [
+    "--background-index",
+    "--compile-commands-dir=build/Debug",
+    "--query-driver=C:/PROGRA~2/ARMGNU~1/*/bin/*,C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/*/bin/*"
+  ],
   "stm32.projectRoot": "${workspaceFolder}",
   "stm32.iocFile": "",
   "stm32.projectName": "",

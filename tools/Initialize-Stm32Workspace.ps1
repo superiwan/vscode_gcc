@@ -11,6 +11,13 @@ $ErrorActionPreference = "Stop"
 
 $TemplateRoot = Split-Path -Parent $PSScriptRoot
 $SkipNames = @(".git", ".vscode", "tools", "build", ".stm32-init-backup", ".omx")
+$ManagedStateFileName = ".stm32-workspace-state.json"
+$ManagedBackupKeepCount = 3
+$CurrentManagedEntries = @(
+    ".vscode",
+    "tools",
+    ".clangd"
+)
 
 function Add-UniqueItem {
     param(
@@ -303,6 +310,124 @@ function Backup-File {
     Copy-Item -LiteralPath $FilePath -Destination (Join-Path $filesRoot (Split-Path -Leaf $FilePath)) -Force
 }
 
+function Get-ManagedStatePath {
+    param(
+        [string]$ProjectPath
+    )
+
+    return (Join-Path $ProjectPath $ManagedStateFileName)
+}
+
+function Read-ManagedState {
+    param(
+        [string]$ProjectPath
+    )
+
+    $statePath = Get-ManagedStatePath -ProjectPath $ProjectPath
+    if (-not (Test-Path -LiteralPath $statePath)) {
+        return $null
+    }
+
+    try {
+        return (Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json)
+    }
+    catch {
+        return $null
+    }
+}
+
+function Remove-ManagedEntry {
+    param(
+        [string]$ProjectPath,
+        [string]$RelativePath
+    )
+
+    if ([string]::IsNullOrWhiteSpace($RelativePath)) {
+        return $false
+    }
+
+    $targetPath = Join-Path $ProjectPath $RelativePath
+    if (-not (Test-Path -LiteralPath $targetPath)) {
+        return $false
+    }
+
+    $resolvedProjectRoot = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\')
+    $resolvedTargetPath = [System.IO.Path]::GetFullPath($targetPath)
+    if (-not $resolvedTargetPath.StartsWith($resolvedProjectRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "拒绝删除超出工程目录的路径：$RelativePath"
+    }
+
+    Remove-Item -LiteralPath $targetPath -Recurse -Force
+    return $true
+}
+
+function Remove-StaleManagedEntries {
+    param(
+        [string]$ProjectPath,
+        [string[]]$CurrentEntries
+    )
+
+    $state = Read-ManagedState -ProjectPath $ProjectPath
+    if (-not $state -or -not $state.managedEntries) {
+        return @()
+    }
+
+    $removed = [System.Collections.Generic.List[string]]::new()
+    foreach ($entry in @($state.managedEntries)) {
+        if ($entry -notin $CurrentEntries) {
+            if (Remove-ManagedEntry -ProjectPath $ProjectPath -RelativePath $entry) {
+                $removed.Add($entry) | Out-Null
+            }
+        }
+    }
+
+    return @($removed)
+}
+
+function Prune-BackupDirectories {
+    param(
+        [string]$ProjectPath,
+        [int]$KeepLatest = 3
+    )
+
+    $backupContainer = Join-Path $ProjectPath ".stm32-init-backup"
+    if (-not (Test-Path -LiteralPath $backupContainer)) {
+        return @()
+    }
+
+    $directories = @(Get-ChildItem -LiteralPath $backupContainer -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending)
+    if ($directories.Count -le $KeepLatest) {
+        return @()
+    }
+
+    $removed = [System.Collections.Generic.List[string]]::new()
+    foreach ($directory in ($directories | Select-Object -Skip $KeepLatest)) {
+        Remove-Item -LiteralPath $directory.FullName -Recurse -Force
+        $removed.Add($directory.FullName) | Out-Null
+    }
+
+    return @($removed)
+}
+
+function Write-ManagedState {
+    param(
+        [string]$ProjectPath,
+        [string[]]$ManagedEntries,
+        [int]$BackupKeepCount
+    )
+
+    $statePath = Get-ManagedStatePath -ProjectPath $ProjectPath
+    $state = [ordered]@{
+        version = 1
+        updatedAt = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+        managedEntries = $ManagedEntries
+        backupKeepCount = $BackupKeepCount
+    }
+
+    $json = $state | ConvertTo-Json -Depth 4
+    Set-Content -LiteralPath $statePath -Value $json -Encoding utf8
+}
+
 function Write-ProjectIgnoreFile {
     param(
         [string]$ProjectPath,
@@ -316,6 +441,7 @@ function Write-ProjectIgnoreFile {
         ".cmake/",
         ".omx/",
         ".stm32-init-backup/",
+        ".stm32-workspace-state.json",
         "CMakeCache.txt",
         "CMakeFiles/",
         "CMakeScripts/",
@@ -497,6 +623,11 @@ if ($missingTools.Count -gt 0) {
     throw "缺少关键工具：$($missingTools -join ', ')。未写入任何项目配置。"
 }
 
+$removedManagedEntries = @(Remove-StaleManagedEntries -ProjectPath $resolvedProjectRoot -CurrentEntries $CurrentManagedEntries)
+foreach ($entry in $removedManagedEntries) {
+    Add-UniqueItem -List $fixed -Value ("已清理旧托管内容：{0}" -f $entry)
+}
+
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $backupRoot = Join-Path $resolvedProjectRoot (".stm32-init-backup\{0}" -f $timestamp)
 New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
@@ -506,6 +637,7 @@ Backup-Path -SourcePath (Join-Path $resolvedProjectRoot "tools") -BackupRoot $ba
 Backup-File -FilePath (Join-Path $resolvedProjectRoot ".gitignore") -BackupRoot $backupRoot
 Backup-File -FilePath (Join-Path $resolvedProjectRoot ".ignore") -BackupRoot $backupRoot
 Backup-File -FilePath (Join-Path $resolvedProjectRoot ".clangd") -BackupRoot $backupRoot
+Backup-File -FilePath (Get-ManagedStatePath -ProjectPath $resolvedProjectRoot) -BackupRoot $backupRoot
 if ($iocPath) {
     Backup-File -FilePath $iocPath -BackupRoot $backupRoot
 }
@@ -573,6 +705,9 @@ Write-ProjectIgnoreFile -ProjectPath $resolvedProjectRoot -FileName ".gitignore"
 Write-ProjectIgnoreFile -ProjectPath $resolvedProjectRoot -FileName ".ignore"
 Add-UniqueItem -List $done -Value "已更新 .gitignore 和 .ignore。"
 
+Write-ManagedState -ProjectPath $resolvedProjectRoot -ManagedEntries $CurrentManagedEntries -BackupKeepCount $ManagedBackupKeepCount
+Add-UniqueItem -List $done -Value "已更新模板托管状态。"
+
 & (Join-Path $resolvedProjectRoot "tools\Invoke-Stm32Doctor.ps1") -WorkspaceRoot $resolvedProjectRoot
 Add-UniqueItem -List $done -Value "环境检查通过。"
 
@@ -599,6 +734,11 @@ if (-not $rootCMakeListsPath) {
         -BuildType Debug
 
     Add-UniqueItem -List $done -Value "已完成 Configure 和 Build 验证。"
+}
+
+$removedBackups = @(Prune-BackupDirectories -ProjectPath $resolvedProjectRoot -KeepLatest $ManagedBackupKeepCount)
+if ($removedBackups.Count -gt 0) {
+    Add-UniqueItem -List $done -Value ("已裁剪旧备份，仅保留最近 {0} 份。" -f $ManagedBackupKeepCount)
 }
 
 Write-Host ""

@@ -17,10 +17,12 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
 这条命令会自动完成这些事：
 
 - 识别 `.ioc`、`CMakeLists.txt`、`startup_*.s`、`*.ld`
-- 备份目标项目原有的 `.vscode` 和 `tools`
+- 备份目标项目原有的模板相关文件
 - 写入模板版 `.vscode`、`tools` 和 `.clangd`
 - 生成本地 [`.vscode/settings.json`](/D:/vscode_gcc/.vscode/settings.template.json) 对应的项目配置
 - 自动修正明显不稳的项目名和 `.ioc` 文件名
+- 清理已经废弃的旧托管内容
+- 只保留最近 3 份初始化备份
 - 检查环境
 - 如果工程能编译，自动 `Configure + Build`
 
@@ -97,9 +99,16 @@ VSCode 扩展建议安装：
 - `tools/`
 - `.clangd`
 - 本地 `.vscode/settings.json`
+- `.stm32-workspace-state.json`
 - `.stm32-init-backup/<时间戳>/`
 
-其中本地 `settings.json` 和备份目录会被加入 `.gitignore`，默认不提交。
+其中本地 `settings.json`、状态文件和备份目录会被加入忽略规则，默认不提交。
+
+这条命令可以重复执行。
+
+- 再执行一次会刷新到模板最新状态
+- 不会重复堆很多套 `.vscode`、`tools`、`.clangd`
+- 旧备份只保留最近 3 份
 
 ## 常用任务
 
@@ -135,6 +144,7 @@ VSCode 扩展建议安装：
 - `.cmake/`
 - `.omx/`
 - `.vscode/settings.json`
+- `.stm32-workspace-state.json`
 - `.stm32-init-backup/`
 
 ## 参考

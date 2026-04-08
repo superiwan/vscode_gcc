@@ -16,7 +16,10 @@ $ManagedBackupKeepCount = 3
 $CurrentManagedEntries = @(
     ".vscode",
     "tools",
-    ".clangd"
+    ".clangd",
+    ".gitignore",
+    ".ignore",
+    ".stm32-workspace-state.json"
 )
 
 function Add-UniqueItem {
@@ -384,6 +387,22 @@ function Remove-StaleManagedEntries {
     return @($removed)
 }
 
+function Remove-ManagedEntries {
+    param(
+        [string]$ProjectPath,
+        [string[]]$Entries
+    )
+
+    $removed = [System.Collections.Generic.List[string]]::new()
+    foreach ($entry in $Entries) {
+        if (Remove-ManagedEntry -ProjectPath $ProjectPath -RelativePath $entry) {
+            $removed.Add($entry) | Out-Null
+        }
+    }
+
+    return @($removed)
+}
+
 function Prune-BackupDirectories {
     param(
         [string]$ProjectPath,
@@ -645,6 +664,10 @@ if ($rootCMakeListsPath) {
     Backup-File -FilePath $rootCMakeListsPath -BackupRoot $backupRoot
 }
 Add-UniqueItem -List $done -Value ("已创建备份目录：{0}" -f $backupRoot)
+
+foreach ($entry in @(Remove-ManagedEntries -ProjectPath $resolvedProjectRoot -Entries $CurrentManagedEntries)) {
+    Add-UniqueItem -List $fixed -Value ("已删除旧托管内容：{0}" -f $entry)
+}
 
 Copy-TemplateDirectory -DirectoryName ".vscode" -ProjectPath $resolvedProjectRoot
 Copy-TemplateDirectory -DirectoryName "tools" -ProjectPath $resolvedProjectRoot

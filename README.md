@@ -18,6 +18,7 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
 
 - 识别 `.ioc`、`CMakeLists.txt`、`startup_*.s`、`*.ld`
 - 备份目标项目原有的模板相关文件
+- 删除当前已托管的旧模板文件
 - 写入模板版 `.vscode`、`tools` 和 `.clangd`
 - 生成本地 [`.vscode/settings.json`](/D:/vscode_gcc/.vscode/settings.template.json) 对应的项目配置
 - 自动修正明显不稳的项目名和 `.ioc` 文件名
@@ -106,7 +107,7 @@ VSCode 扩展建议安装：
 
 这条命令可以重复执行。
 
-- 再执行一次会刷新到模板最新状态
+- 再执行一次会先删掉旧托管文件，再刷新到模板最新状态
 - 不会重复堆很多套 `.vscode`、`tools`、`.clangd`
 - 旧备份只保留最近 3 份
 

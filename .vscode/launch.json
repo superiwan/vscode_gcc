@@ -13,7 +13,7 @@
       "stlinkPath": "${config:stm32.stlinkGdbServerPath}",
       "stm32cubeprogrammer": "${config:stm32.cubeProgrammerPath}",
       "runToEntryPoint": "${config:stm32.runToEntryPoint}",
-      "executable": "${command:cmake.launchTargetPath}",
+      "executable": "${workspaceFolder}/build/Debug/${config:stm32.projectName}.elf",
       "preLaunchTask": "STM32: Build"
     },
     {
@@ -27,7 +27,7 @@
       "interface": "${config:stm32.interface}",
       "gdbPath": "${config:stm32.toolchainGdbPath}",
       "runToEntryPoint": "${config:stm32.runToEntryPoint}",
-      "executable": "${command:cmake.launchTargetPath}",
+      "executable": "${workspaceFolder}/build/Debug/${config:stm32.projectName}.elf",
       "overrideLaunchCommands": [
         "monitor halt",
         "load",
@@ -52,7 +52,7 @@
       "gdbPath": "${config:stm32.toolchainGdbPath}",
       "stlinkPath": "${config:stm32.stlinkGdbServerPath}",
       "stm32cubeprogrammer": "${config:stm32.cubeProgrammerPath}",
-      "executable": "${command:cmake.launchTargetPath}"
+      "executable": "${workspaceFolder}/build/Debug/${config:stm32.projectName}.elf"
     }
   ]
 }

@@ -126,6 +126,8 @@ VSCode 扩展建议安装：
 
 调试入口已经在 [`.vscode/launch.json`](/D:/vscode_gcc/.vscode/launch.json) 里配好。
 
+这套模板的调试配置直接指向 `build/Debug/<project>.elf`，不依赖 `CMake Tools` 的 `cmake.launchTargetPath`。
+
 常用配置：
 
 - `STM32: Debug active CMake target`

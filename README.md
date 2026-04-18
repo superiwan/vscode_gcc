@@ -14,6 +14,12 @@
 powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Workspace.ps1 -ProjectRoot "<工程根目录>"
 ```
 
+如果拿到的是别人给的 STM32 工程，不是标准 `CubeMX` 根工程，用这个新脚本：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Bootstrap-Stm32BrownfieldWorkspace.ps1 -ProjectRoot "<工程根目录>"
+```
+
 这条命令会自动完成这些事：
 
 - 识别 `.ioc`、`CMakeLists.txt`、`startup_*.s`、`*.ld`
@@ -27,6 +33,33 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
 - 检查环境
 - 如果工程能编译，自动 `Configure + Build`
 
+## Brownfield 脚本
+
+[`Bootstrap-Stm32BrownfieldWorkspace.ps1`](/D:/vscode_gcc/tools/Bootstrap-Stm32BrownfieldWorkspace.ps1) 专门处理：
+
+- 别人给的 STM32 工程
+- 非 `CubeMX` 工程
+- `HAL/LL`
+- 老标准库工程
+
+它会优先按这些线索识别工程：
+
+- 根 `CMakeLists.txt`
+- `startup_*.s`
+- `*.ld`
+- 常见 STM32 目录
+- `Keil/IAR/Eclipse` 工程文件
+
+它的目标是：
+
+- 能识别就尽量补到可编译
+- 能确认芯片和产物就补到可调试
+- 信息不够时保守停下，只提示缺项
+
+已知边界：
+
+- 如果工程只有 `Keil/ARMCC` 风格的 startup 文件，没有 GNU 兼容 startup，脚本会保守停止，不会硬生成一套错误构建。
+
 ## 仓库里有什么
 
 - [`.vscode/settings.template.json`](/D:/vscode_gcc/.vscode/settings.template.json)
@@ -39,6 +72,8 @@ powershell -ExecutionPolicy Bypass -File D:\vscode_gcc\tools\Initialize-Stm32Wor
   调试入口。
 - [`tools/Initialize-Stm32Workspace.ps1`](/D:/vscode_gcc/tools/Initialize-Stm32Workspace.ps1)
   一键初始化入口。
+- [`tools/Bootstrap-Stm32BrownfieldWorkspace.ps1`](/D:/vscode_gcc/tools/Bootstrap-Stm32BrownfieldWorkspace.ps1)
+  给 brownfield / legacy STM32 工程补齐工作区和构建入口。
 - [`tools/STM32.Common.ps1`](/D:/vscode_gcc/tools/STM32.Common.ps1)
   统一做路径处理和工具探测。
 - [`tools/Invoke-Stm32Doctor.ps1`](/D:/vscode_gcc/tools/Invoke-Stm32Doctor.ps1)
@@ -101,6 +136,7 @@ VSCode 扩展建议安装：
 - `.clangd`
 - 本地 `.vscode/settings.json`
 - `.stm32-workspace-state.json`
+- `.stm32-brownfield-state.json`
 - `.stm32-init-backup/<时间戳>/`
 
 其中本地 `settings.json`、状态文件和备份目录会被加入忽略规则，默认不提交。

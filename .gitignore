@@ -3,6 +3,7 @@ build/
 .cache/
 .cmake/
 .stm32-init-backup/
+.stm32-brownfield-backup/
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
@@ -22,6 +23,7 @@ _deps/
 *.o
 *.d
 .vscode/settings.json
+.stm32-brownfield-state.json
 .vscode/*.code-snippets
 .vscode/ipch/
 *.log

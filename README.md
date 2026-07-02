@@ -114,6 +114,23 @@ VSCode 扩展建议安装：
 - `clangd` 负责代码分析、补全和红线
 - `cpptools` 保留给调试
 
+## 跳转定义和路径
+
+模板默认用 `clangd` 负责跳转定义、补全和代码索引。本地生成的 `.vscode/settings.json` 会指向：
+
+- `${workspaceFolder}/build/Debug`
+
+这表示编译数据库始终从当前打开的 VS Code 工作区根目录下寻找。只要你用 VS Code 打开的是目标工程根目录，后续移动工程目录时通常不需要手动改 `clangd.arguments`。
+
+如果不能跳转定义，优先检查：
+
+- VS Code 是否打开了工程根目录，而不是上级目录或子目录
+- 是否已经运行过 `STM32: Configure` 或 `STM32: Build`，并生成 `build/Debug/compile_commands.json`
+- 是否安装并启用了 `llvm-vs-code-extensions.vscode-clangd`
+- `clangd: Restart language server` 后是否恢复
+
+模板会在 `--query-driver` 中放宽匹配 `Arm GNU Toolchain` 的短路径和长路径，避免 Windows 8.3 短文件名导致 clangd 无法识别交叉编译器。
+
 ## 识别规则
 
 - 有唯一 `.ioc`：优先按 `CubeMX` 工程处理
@@ -149,14 +166,16 @@ VSCode 扩展建议安装：
 
 ## 常用任务
 
-- `STM32: Check Environment`
-- `STM32: Generate From CubeMX`
-- `STM32: Build`
-- `STM32: Build and Flash`
-- `STM32: Rebuild and Flash`
-- `STM32: Flash`
-- `STM32: Erase Chip`
-- `STM32: Open CubeMX`
+- `STM32: Build`：只编译工程，改代码后先用它看是否有编译错误。
+- `STM32: Flash`：只烧录已经编译好的产物。
+- `STM32: Rebuild and Flash`：清理、重新构建并烧录，适合改完代码直接下板运行。
+- `STM32: Check Environment`：检查 CMake、Ninja、Arm GNU Toolchain、CubeProgrammer、GDB Server 等工具。
+- `STM32: Clean Build Dir`：清理构建目录。改了 CMake 配置、索引异常或构建状态很乱时再用。
+- `STM32: Configure`：重新配置 CMake。首次初始化、清理构建目录后或修改 `CMakeLists.txt` 后使用。
+- `STM32: Open CubeMX`：只打开 CubeMX，不自动生成工程。
+- `STM32: Generate From CubeMX`：让 CubeMX 重新生成工程。只建议标准 CubeMX 根工程使用；brownfield / legacy 工程不要随手点。
+- `STM32: Erase Chip`：整片擦除芯片，只在需要清空芯片或烧录异常排查时使用。
+- `STM32: Start GDB Server` / `STM32: Stop GDB Server`：调试时管理外部 GDB Server，普通编译烧录不用。
 
 ## 调试
 

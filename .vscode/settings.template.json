@@ -11,8 +11,8 @@
   },
   "clangd.arguments": [
     "--background-index",
-    "--compile-commands-dir=build/Debug",
-    "--query-driver=C:/PROGRA~2/ARMGNU~1/*/bin/*,C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/*/bin/*"
+    "--compile-commands-dir=${workspaceFolder}/build/Debug",
+    "--query-driver=C:/PROGRA~2/ARMGNU~1/*/bin/*.EXE,C:/PROGRA~2/ARMGNU~1/*/bin/*.exe,C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/*/bin/arm-none-eabi-gcc.exe"
   ],
   "stm32.projectRoot": "${workspaceFolder}",
   "stm32.iocFile": "",

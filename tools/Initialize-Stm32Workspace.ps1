@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Mandatory)]
     [string]$ProjectRoot
@@ -219,6 +219,18 @@ function Set-IocProjectMetadata {
         $content = [regex]::Replace($content, '(?m)^ProjectManager\.ProjectFileName=.*$', "ProjectManager.ProjectFileName=$ProjectFileName")
     } else {
         $content = $content.TrimEnd("`r", "`n") + "`r`nProjectManager.ProjectFileName=$ProjectFileName`r`n"
+    }
+
+    if ($content -match '(?m)^ProjectManager\.TargetToolchain=') {
+        $content = [regex]::Replace($content, '(?m)^ProjectManager\.TargetToolchain=.*$', "ProjectManager.TargetToolchain=CMake")
+    } else {
+        $content = $content.TrimEnd("`r", "`n") + "`r`nProjectManager.TargetToolchain=CMake`r`n"
+    }
+
+    if ($content -match '(?m)^ProjectManager\.UnderRoot=') {
+        $content = [regex]::Replace($content, '(?m)^ProjectManager\.UnderRoot=.*$', "ProjectManager.UnderRoot=true")
+    } else {
+        $content = $content.TrimEnd("`r", "`n") + "`r`nProjectManager.UnderRoot=true`r`n"
     }
 
     Set-Content -LiteralPath $IocPath -Value $content -Encoding utf8
